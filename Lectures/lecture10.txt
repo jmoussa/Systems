@@ -1,0 +1,56 @@
+Process Lifecycle 2/23
+Process - OS abstraction for running code
+
+--------------------------------------------------------------------------
+Process Makeup:
+-BSS Basic Service Set
+-text
+-code
+-data
+-Stack
+-Heap
+
+--------------------------------------------------------------------------
+Creating Processes:
+
+fork command - creates a "duplicate" process CALLED ONCE RETURNS TWICE
+	different:
+	-pid
+	-address space
+	-ppid parent process ID
+
+	same:
+	-all code
+	-all data
+	-signal disposition
+	-file handles
+
+
+exec command - executes a file (reallocates the duplicate for exectution)
+	returns ONLY if an error has occured
+
+
+if result of fork > 0
+	parent
+else if fork == 0
+	child exec("./somefile")
+else
+	error
+
+
+--------------------------------------------------------------------------
+Finishing a Process:
+
+wait command - called on the parent to check if child orocess is finished and deallocates child process ONLY IF it is finished
+
+-------------------------------------------------------------------------
+Zombie Process- child that has no more execution to do, but parent has not called wait
+
+Orphan Process- child whose parent has died without calling wait
+
+init/scheduler- process 0 (first process, no PPID)
+	CANNOT BE FORKED, THER CAN BE ONLY ONE
+
+
+
+

@@ -50,7 +50,7 @@ Orphan Process- child whose parent has died without calling wait
 
 init/scheduler- process 0 (first process, no PPID)
 	CANNOT BE FORKED, THER CAN BE ONLY ONE
-
+	Adopts all Orphan processes (changes orphans ppid to init)
 
 
 

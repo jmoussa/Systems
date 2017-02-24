@@ -12,7 +12,6 @@ typedef struct memoryAllocation{
 
 static node *head;
 
-
 //prototypes
 void* changeMemory(node *mem,size_t numBytes,int free,void *ptr,node *next);
 int clean(node* mem, int place);
@@ -128,4 +127,16 @@ int clean(node* mem, int place){
   }
   return mem->free;
 
+}
+
+void printHeap(){
+  node*current =head;
+  printf("%s\n", current ? "Heap contents:\n" : "Heap is Empty");
+
+  int i = 1;
+  while(current){
+    printf("Block %d: free: %s\tbytes: %zu\n", i++, (current->free) ? "yes" : "no", current->numBytes);
+  	current = current->next;
+	}
+	return;
 }

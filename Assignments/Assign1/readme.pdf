@@ -1,0 +1,8 @@
+Memory Allocation++
+
+Joseph Moussa-mymalloc.c, mymalloc.h
+Enkai Ji-memgrind.c, testcases.txt
+
+Our design allows the user to properly allocate/deallocate memory (with a 5000 byte limit), without fear of reprocussions. This means the system will not crash if the user acts incorrectly while allocating or deallocating memory.
+
+We used a linked list of nodes as descriptors for memory blocks. The mymalloc() function checks for free space and sbrk if there isn't any. Myfree() looks through the linked list for a pointer matching the user input, and marks it as free if it's found, if not an error should prompt you of failure. Another feature of my free is how it prevents fragmentation by compiling adjacent free blocks/nodes.

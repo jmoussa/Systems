@@ -20,7 +20,7 @@ int clean(node* mem, int place);
 
 void* mymalloc(size_t numBytes, const char* file, const int lineNum)
 {
-  if(numBytes > MAX_MEM){
+  if((int)numBytes > (int)MAX_MEM){
     printf("No more memory on line %d, in file, %s\n", lineNum, *file);
   }
   
@@ -65,6 +65,7 @@ void myfree(void* ptr, const char* file, const int lineNum)
 {
 	node* prev = NULL;
 	node* current = head;
+  //Check if it's already free
   if(current->free){
     printf("Pointer has already been freed on line: %d, in file %s\n", lineNum, *file);
     return;

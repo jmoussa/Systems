@@ -1,6 +1,6 @@
-all: memgrind
+all: memgrind 
 
-memgrind: memgrind.c mymalloc.o
+memgrind: mymalloc.o memgrind.c
 	gcc -g -Wall memgrind.c mymalloc.o -o memgrind
 
 mymalloc.o: mymalloc.c mymalloc.h

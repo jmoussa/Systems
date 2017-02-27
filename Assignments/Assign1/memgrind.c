@@ -12,10 +12,20 @@ int main(int argc, char const *argv[])
 		p=(char*)malloc(1);
 		free(p);
 	}
+  free(p);
 	printHeap();
 
-	//A
+  
+
+
+
+
+
+
+  //E Memory Overload
   p = (char*)malloc(5001);
-  printHeap();
+  printHeap;
+  
+  
 	return 0;
 }

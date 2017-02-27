@@ -3,7 +3,6 @@
 #include <unistd.h>
 #include <string.h>
 
-#define MAX_MEM 5000
 
 typedef struct memoryAllocation {
 	size_t numBytes;
@@ -66,12 +65,7 @@ void myfree(void* ptr, const char* file, const int lineNum)
 {
 	node* prev = NULL;
 	node* current = head;
-  //Check if it's already free
-  if(current->free){
-    printf("Pointer has already been freed\n");
-    return;
-  }
-
+  
 	while (current) {
 		if (current->ptr == ptr) {
 			if (current->free) {

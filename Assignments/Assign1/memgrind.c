@@ -5,8 +5,16 @@
 
 int main(int argc, char const *argv[])
 {
-	void* p= malloc(100);
-	free(p);
+	//B 
+	int i;
+	int *p;
+	for(i=0; i<1001; i++){
+		int *p=(int*)malloc(1);
+		free(p);
+	}
 	printHeap();
+
+	//A
+	
 	return 0;
 }

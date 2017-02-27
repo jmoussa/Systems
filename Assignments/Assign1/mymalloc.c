@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#define MAX_MEM 5000
+
 typedef struct memoryAllocation {
 	size_t numBytes;
 	int free;
@@ -18,7 +20,11 @@ int clean(node* mem, int place);
 
 void* mymalloc(size_t numBytes, const char* file, const int lineNum)
 {
-	//no entries
+  if(numBytes > MAX_MEM){
+    printf("No more memory on line %d, in file, %s\n", lineNum, *file);
+  }
+  
+  //no entries
 	if (!head) {
 		head = (node*)sbrk(sizeof(node) + numBytes);
 		if (head == (void*)-1) {
@@ -59,6 +65,10 @@ void myfree(void* ptr, const char* file, const int lineNum)
 {
 	node* prev = NULL;
 	node* current = head;
+  if(current->free){
+    printf("Pointer has already been freed on line: %d, in file %s\n", lineNum, *file);
+    return;
+  }
 
 	while (current) {
 		if (current->ptr == ptr) {

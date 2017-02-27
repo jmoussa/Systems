@@ -15,6 +15,7 @@ int main(int argc, char const *argv[])
 	printHeap();
 
 	//A
-	
+  p = (int*)malloc(5001);
+  printHeap();
 	return 0;
 }

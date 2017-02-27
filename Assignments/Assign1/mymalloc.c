@@ -21,14 +21,14 @@ int clean(node* mem, int place);
 void* mymalloc(size_t numBytes, const char* file, const int lineNum)
 {
   if((int)numBytes > (int)MAX_MEM){
-    printf("No more memory on line %d, in file, %s\n", lineNum, *file);
+    printf("No more memory");
   }
   
   //no entries
 	if (!head) {
 		head = (node*)sbrk(sizeof(node) + numBytes);
 		if (head == (void*)-1) {
-			printf("No more memory on line %d, file, %s\n", lineNum, *file);
+			printf("No more memory");
 		}
 		changeMemory(head, numBytes, 0, head + 1, NULL);
 		return head->ptr;
@@ -53,7 +53,7 @@ void* mymalloc(size_t numBytes, const char* file, const int lineNum)
 	//Allocating on the heap
 	current = (node*)sbrk(sizeof(node) + numBytes);
 	if (current == (void*)-1) {
-		printf("No more memory on line %d, file %s\n", lineNum, *file);
+		printf("No more memory\n");
 		return NULL;
 	}
 	changeMemory(current, numBytes, 0, (void*)(current + 1), NULL);
@@ -67,14 +67,14 @@ void myfree(void* ptr, const char* file, const int lineNum)
 	node* current = head;
   //Check if it's already free
   if(current->free){
-    printf("Pointer has already been freed on line: %d, in file %s\n", lineNum, *file);
+    printf("Pointer has already been freed\n");
     return;
   }
 
 	while (current) {
 		if (current->ptr == ptr) {
 			if (current->free) {
-				printf("Pointer already freed on line: %d, in file %s\n", lineNum, *file);
+				printf("Pointer already freed\n");
 				return;
 			}
 			current->free = 1;
@@ -91,7 +91,7 @@ void myfree(void* ptr, const char* file, const int lineNum)
 		prev = current;
 		current = current->next;
 	}
-	printf("ERROR Pointer not given on line: %d, in file: %s\n", lineNum, *file);
+	printf("ERROR Pointer not given");
 	return;
 }
 

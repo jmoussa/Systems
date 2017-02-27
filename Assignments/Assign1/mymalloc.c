@@ -20,15 +20,16 @@ int clean(node* mem, int place);
 
 void* mymalloc(size_t numBytes, const char* file, const int lineNum)
 {
-  if((int)numBytes > (int)MAX_MEM){
-    printf("No more memory");
+  if((int)numBytes > 5000){
+    printf("No more memory\n");
+    return head;
   }
   
   //no entries
 	if (!head) {
 		head = (node*)sbrk(sizeof(node) + numBytes);
 		if (head == (void*)-1) {
-			printf("No more memory");
+			printf("No more memory\n");
 		}
 		changeMemory(head, numBytes, 0, head + 1, NULL);
 		return head->ptr;
@@ -91,7 +92,7 @@ void myfree(void* ptr, const char* file, const int lineNum)
 		prev = current;
 		current = current->next;
 	}
-	printf("ERROR Pointer not given");
+	printf("ERROR Pointer not given\n");
 	return;
 }
 

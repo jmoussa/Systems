@@ -1,0 +1,71 @@
+Lecture 11 2/28
+
+--------------------------------------------------------------------------------------------
+LAST TIME                                                                                  |
+--------------------------------------------------------------------------------------------
+
+Processes: 
+  OS' abstrction for running code
+
+fork() : 'duplicates' the process that calls it (returns twice)
+          makes child of the parent
+          child has UNIQUE
+            -pid
+            -ppid
+            -memory/address space
+          child&parent just called fork() and are waiting for a return
+
+exec() : executes a file (reallocates the duplicate for execution)
+         ONLY returns if an error occurs
+
+wait() : called on parent to check if child is finished and deallocates if finished
+
+---------------------------------------------------------------------------------------------
+
+Zombie : child is finished - parent has not called wait
+
+Orphan : child whose parent had died without calling wait
+
+init/scheduler : process 0 (first process, no PPID)
+                 cannot be forked
+                 adopts all orphans
+
+  
+----------------------------------------------------------------------------------------------
+SIGNALS/SIGNAL HANDLERS:                                                                     |
+----------------------------------------------------------------------------------------------
+
+signal_handler(int signum){
+
+}
+
+main(){
+  if (signal 11 occurs){
+    signal(SIGSEGV, signal_handler/<function pointer>);
+  }
+}
+
+
+signal handlers - not call, but does return (invoked by OS when a given event occurs)
+
+exit(-1)
+_exit
+
+instruction 0
+instruction 1
+instr...signal!...check for handler..handler exists...invoke function...run to completion... sighandler returns
+instruction 2
+instruction 3
+...
+
+return -> end of executable stack code
+exit -> donw with process container ... can react to the exit signal with on_exit(funcpointer)
+_exit()-> AHHHHHHH Punch out of the process ASAP
+
+
+---------------------------------------------------------------------------------------------
+THREADS                                                                                     |
+---------------------------------------------------------------------------------------------
+
+threads : multiple execution contexts (stacks, for short) in the same process
+          run a function 'simultaneously' alongside main

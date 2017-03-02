@@ -1,0 +1,61 @@
+Lecture 12 (REVIEW FOR EXAM 1)
+
+------------------------------------------
+Makefiles                                |
+------------------------------------------
+
+<directive> : <req0>... <reqN>
+  <cmd>
+
+<req0>: <files/reqs>
+  <cmd>
+
+
+Example:
+---------------
+example.c
+lib.h
+lib.c
+
+all: example.c lib.h lib.o
+  gcc -o example example.c lib.o
+
+lib.o: lib.h lib.c
+  gcc -c lib.c
+
+clean:
+  rm -rf ./*.o ./example
+
+
+-------------------------------------------
+Stages of the C Compiler                  |
+-------------------------------------------
+
+Preprocessing -Text replacement, define namespace
+Compilation - Compile to assembly
+Assembing - assemble (room for optimizations)
+Linking - reference/link to libraries, relocation
+
+
+-------------------------------------------
+Linking                                   |
+-------------------------------------------
+
+Static Linking:
+  -resolved and addressed at compile time
+
+Dynamic Linking:
+  -linked to the program on access/at runtime
+  
+
+-------------------------------------------
+grep                                      |
+-------------------------------------------
+
+Search for argument
+  ls | grep <argument>
+
+
+
+
+

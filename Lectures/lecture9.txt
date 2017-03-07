@@ -19,7 +19,8 @@ LAST TIME-----------------------------------------------------------------------
 
 -----------------------------------------------------------
 
- Function Pointers (best used in abstract classes)
+Function Pointers (best used in abstract classes)
+
  int stuff(char b, float other)
  int (*funcPointer)(char,float) = stuff;
  fp(2, 1.2);

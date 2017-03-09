@@ -1,0 +1,114 @@
+Lecture 14 (After EXAM0)
+
+-------------------------------------
+I/O:                                |
+-------------------------------------
+OS Abstraction for something you can read or write
+
+Blocking: Make a function call and not return until it's done
+Non-Blocking: Function returns BEFORE it's done
+
+-------------
+read()      |
+-------------
+Acts like a cursor and reads from last read function's exit
+man 2 read
+
+read(file, ptr, 100 <num of bytes to read>)
+
+
+Example-------------------------------------
+
+char* ptr = (char*)malloc(sizeof(char)*100);
+int status = 0;
+
+status = read(file, ptr, 100);
+
+Example2------------------------------------
+
+int amount=100;
+int readin = 0;
+char* ptr = (char*)malloc(sizeof(char)*amount);
+int status = 0;
+
+while(amount>0){
+  status = read(file,ptr,amount);
+  if(status>0){
+    amount--;
+    amount-=status;
+  }else{
+    //oh no
+  }
+}
+
+------------
+open()     |
+------------
+
+returns -1 on failure
+
+int open("./file", <flags>);
+O_RDWR
+O_RDONLY
+O_WRONLY
+O_CREAT
+O_APPEND
+
+man 2 open
+bitwise combinators '|' to combine flags
+
+
+Example--------------------------------------
+
+int file = open("/.somefile", O_RDWR | O_CREAT);
+if(fd==-1){
+  //error
+}
+int amount=100;
+int readin=0;
+char* ptr=(char*)malloc(sizeof(char)*amount);
+int status=0;
+int offset = status;
+while(amount>0){
+  offset+=status;
+  status = read(file,ptr+offset,amount);
+  if(status=>0){
+    amount -= status;
+  }else{
+    //oh noes!!!!!
+  }
+}
+close(file);
+
+
+-------------------------
+opendir                 |
+readdir                 |
+-------------------------
+In type field: 
+  DT-DIR-> directory
+  DT-REG-> regular file
+
+
+Example--------------------------------------
+./thing/stuff/other.txt
+
+main:
+  -open/read dir
+    thing is dir
+
+  dirhandler(... "./thing/")
+  -open/read dir
+  -first element is stuff
+    ... it's a dir ...
+
+  dirhandler(... "./thing/stuff/")
+  -open/read dir
+  -first element is other.txt
+    name[] is: "other.txt"
+      "/thing/stuff/other.txt"
+
+Every time you open a new directory, you should pass along the path
+
+
+

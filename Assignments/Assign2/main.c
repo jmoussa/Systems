@@ -8,7 +8,7 @@ int main(int argc, char const *argv[])
 	// All tokens in the file and their counts will be
 	// stored in the LinkedList 'head'
 	// ****************************************************************
-	struct Node* head = countFromFile("./testcases/1.txt");
+	struct Node* head = countFromSingleFile("./testcases/1.txt");
 
 
 	// ****************************************************************

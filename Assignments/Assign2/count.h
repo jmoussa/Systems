@@ -10,6 +10,6 @@ struct Node
     struct Node* next;
 };
 
-struct Node* countFromFile(char* fileAddress);
+struct Node* countFromSingleFile(char* fileAddress);
 
 #endif

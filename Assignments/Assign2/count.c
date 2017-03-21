@@ -42,7 +42,7 @@ struct Node* save(struct Node* head, char* token)
 	return head;
 }
 
-struct Node* countFromFile(char* fileAddress)
+struct Node* countFromSingleFile(char* fileAddress)
 {
 	struct Node* head = NULL;
 	char c;

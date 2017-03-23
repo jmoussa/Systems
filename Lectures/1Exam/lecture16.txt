@@ -1,3 +1,63 @@
 Lecture 16 3/23/16
 
+========================================================================
+Threads                                                                |
+========================================================================
+
+>Asynchronus function - don't have to wait for it to finish (works in the background)
+    -Don't necessarily need a value back
+    -Used in I/O
+    -Essentially adds another stack
+
+>Proc0:
+    F &2
+    Decode
+    Exec
+    F &3
+    Decode
+    Exec
+    ....
+    F &21
+    Decode
+    Exec
+    F &31
+    Decode
+    Exec
+
+
+============================
+Building a Thread          |
+============================
+
+int pthread_create(pthread_t *thread, cons pthread_attr_t *attr, void*(*start_routine)(void*), void *arg)
+compile and link with -pthread
+
+------------------------------------------------------------------------
+>Must pass in a function pointer for that function
+    int somefunc(float a);
+    int (*someFuncPtr)(float) = somefunc;
+
+>Do not return for the whole process
+    -Should call pthread_exit
+
+
+============================
+Signals                    |
+============================
+>OS takes over, pushes new stack frame on your stack, updades PC and stores previous PC
+    -hijacks current state
+    -Ex: SegFault, redraw terminal window
+    -Not necessarily errors but pause execution states
+
+>Invoke Signal Handler
+>Run signal handler to completion
+>Return
+
+
+============================
+Building a Singal Handler  |
+============================
+>function pointer
+>signal mask
+
 

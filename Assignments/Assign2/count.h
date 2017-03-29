@@ -3,13 +3,13 @@
 
 #define maxTokenLength 100
 
-struct Node
+typedef struct Node
 {
     char token[maxTokenLength];
     int count;
     struct Node* next;
-};
+} Node;
 
-struct Node* countFromSingleFile(char* fileAddress);
+Node* countFromSingleFile(char* fileAddress);
 
 #endif

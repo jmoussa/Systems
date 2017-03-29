@@ -1,30 +1,32 @@
 #include "count.h"
 #include <dirent.h>
 #include <stdio.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <limits.h>
 #include <errno.h>
+
+char * getnewpath(char *, char *);
+static void recursiveSearch(char*);
 
 static void recursiveSearch(char* dirname){
 	DIR * dir;
 	dir = opendir(dirname);
 	Node * head;
+	char* newpath;
 	if(!dir){
 		printf("Error Cannot Open Directory");
 		exit(EXIT_FAILURE);
 	}
+	struct dirent* entry;
+	const char * d_name; //name of the file
 
-	while(1){
-		struct dirent* entry;
-		const char * d_name; //name of the file
+	entry = readdir(dir);
 
-		entry = readdir(dir);
-		if(!entry){
-			//no more entries in this dir
-			break;
-		}
+	while(entry!=NULL){
 
 		d_name = entry->d_name;
 		
@@ -37,18 +39,11 @@ static void recursiveSearch(char* dirname){
 			}
 		}
 		
-		if(entry->d_type & DT_DIR){
-			if(strcmp(d_name, "..")!=0 && strcmp(d_name, ".")!=0){
-				int path_length;
-                char path[PATH_MAX];
- 
-                path_length = snprintf (path, PATH_MAX,"%s/%s", dirname, d_name);
-                if (path_length >= PATH_MAX) {
-                    fprintf (stderr, "Path length has got too long.\n");
-                    exit (EXIT_FAILURE);
-                }
-				recursiveSearch(path);
-			}
+		if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")){
+			newpath = getnewpath(dirname, entry->d_name);
+			recursiveSearch(newpath);
+			free(newpath);
+			newpath = NULL;	
 		}
 	}
 	if(closedir(dir)){
@@ -58,6 +53,13 @@ static void recursiveSearch(char* dirname){
 
 }
 
+char * getnewpath(char * dirname, char * newdir){
+	char * newpath = (char *) calloc(strlen(dirname) + strlen(newdir) + 2, 1);
+	newpath = strcpy(newpath, dirname);
+	newpath = strcat(newpath, "/");
+	newpath = strcat(newpath, newdir);
+	return newpath;
+}
 
 int main(int argc, char const *argv[])
 {

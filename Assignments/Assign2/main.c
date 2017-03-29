@@ -68,7 +68,7 @@ int main(int argc, char const *argv[])
 	// stored in the LinkedList 'head'
 	// ****************************************************************
 	//Node* head = countFromSingleFile("./testcases/1.txt");
-
+	
 
 	// ****************************************************************
 	// Print TOKENs and COUNTs
@@ -80,6 +80,14 @@ int main(int argc, char const *argv[])
 		tmp=tmp->next;
 	}
    	*/
+
+
+	//BUILD INDEX
+	
+
+
+
+	//TODO Save index to a file (write and save to a file)
 
 	return 0;
 }

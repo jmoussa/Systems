@@ -44,14 +44,15 @@ balance+=100            balance+= -50;
                         ror = ...
                         interest = ...
 unlock(mutex_balance);  unlock(mutex_balance);
+---------------------------------
 
 mutex: MUTual EXclusion device
     -best to have 1 MUTEX PER SHARED VARIABLE
     -total ordering when locking mutexes (same lock order across threads)
 
 Critical Sections: areas of code where you access/modify shared data
-TIP: Keep critical sections as small as possible (otherwise it's pointless to imlement threads)
-    unlock as soon as you're finished with shared memory/variables
+    TIP: Keep critical sections as small as possible (otherwise it's pointless to imlement threads)
+        unlock as soon as you're finished with shared memory/variables
 
 -----------------------------------------------------------------------------------------------------------------------------
 Side Note:

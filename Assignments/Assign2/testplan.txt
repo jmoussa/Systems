@@ -1,0 +1,17 @@
+In order to test the recursive traversing process, we create the following typical directory strucutre:
+
+/testcases
+	/folder1
+		/folder11
+			ddddd.txt
+		/folder12
+			ewe.txt
+		ddddde.txt
+	/folder2
+		wrwr.txt
+	1.txt
+
+For contents in each single file, we copied some random texts from other place. Including number, alphbetic charaters, and punctuations.
+
+Since we use linked list to implement the main data structure, our program can handle as many files as possible if the memory is enough.
+However stackoverflow may occur if there are too many nested directories.

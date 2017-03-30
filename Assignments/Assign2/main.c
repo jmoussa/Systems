@@ -52,12 +52,25 @@ void recursiveSearch(char* dirname){
 			Node* tmp=head;
 			while (tmp!=NULL) {
 				if(searchHash(hashTable,tmp->token)==-1){//couldnt find word
-					hashNode* top = newHashNode(hashTable,tmp->token, NULL, NULL);
+					hashNode* top = newHashNode(hashTable,tmp->token, hashTable->next, NULL);
 					linkNode* first = newLinkNode(top,d_name, 1, NULL);
 					top->link=first;
 				}else{
-					hashNode* word = searchHash(hashTable,tmp->token);
+					hashNode* word = searchHash(hashTable,tmp->token); 
+					linkNode* temp = word->link;
+					while(temp->link!=NULL){
 						
+						if(temp->filename == d_name){
+							temp->count += 1; //if the filename is found amongst the word hash, increment
+							break;
+						}else{
+							temp = temp->link;
+						}
+					}
+					if(temp->link==NULL){
+						linkNode* newFile = newLinkNode(hashTable,d_name,1, NULL); //inserts a newLink if the file is new (or not found in the linkNode list)
+						temp->link = newFile;
+					}
 				}
 
 			tmp=tmp->next;

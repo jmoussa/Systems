@@ -91,9 +91,9 @@ void recursiveSearch(char* dirname){
 
 	while(entry!=NULL){
 
-		d_name = entry->d_name;
+		d_name = entry->d_name; //file or directory name
 		
-		if((entry->d_type & DT_REG)){
+		if((entry->d_type & DT_REG)){ //if it's a file
 			head = countFromSingleFile(d_name);
 			Node* tmp=head;
 			while (tmp!=NULL) {
@@ -164,12 +164,44 @@ void printAsXml(hashNode* head) {
 	printf("</fileIndex>\n");
 }
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
-	Node* head = countFromSingleFile("./testcases/1.txt");
+	Node* head;
 	
+	if(open(argv[2],O_RDONLY)== -1){
+		recursiveSearch(argv[2]);
+	}else{
+			head = countFromSingleFile(argv[2]);
+			Node* tmp=head;
+			while (tmp!=NULL) {
+				if(searchHash(hashTable,tmp->token)==NULL){//couldnt find word
+					hashNode* newHash = newHashNode(hashTable,tmp->token, NULL, NULL); 
+					linkNode* first = newLinkNode(argv[2], 1, NULL);
+					newHash->link=first;
+				}else{
+					hashNode* word = searchHash(hashTable,tmp->token); 
+					linkNode* temp = word->link;
+					while(temp->link!=NULL){
+						
+						if(temp->filename == argv[2]){
+							temp->count += 1; //if the filename is found amongst the word hash, increment
+							break;
+						}else{
+							temp = temp->link;
+						}
+					}
+					if(temp->link==NULL){
+						linkNode* newFile = newLinkNode(word,argv[2],1, NULL); //inserts a newLink if the file is new (or not found in the linkNode list)
+						temp->link = newFile;
+					}
+				}
+
+			tmp=tmp->next;
+			}
+
+	}
 
 	
-
+	printAsXml(hashTable);
 	return 0;
 }

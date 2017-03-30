@@ -1,0 +1,3 @@
+All the .h and .c files necessary to produce an executable named index.
+A makefile used to compile and produce the index executable.
+It must have a target ¡®clean¡¯ to prepare a fresh compilation of everything.

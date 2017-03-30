@@ -1,0 +1,6 @@
+The XML format lets us easily read the inverted index for debugging. You should carefully consider
+how the program may break and code it robustly. You should outline and implement a strategy to deal
+with potential problems and inconsistencies. For example, if a file already exists with the same name
+as the inverted-index file name, you should ask the user if they wish to overwrite it. If the name of the
+directory or file you want to index does not exist, your indexer should print an error message and exit
+gracefully rather than crash. There are many other error cases that you ought to consider.

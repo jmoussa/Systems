@@ -1,0 +1,4 @@
+A tarred gzipped file named Asst2.tgz that contains a directory called Asst2 with the following files in it:
+All the .h and .c files necessary to produce an executable named index.
+A makefile used to compile and produce the index executable.
+It must have a target ¡®clean¡¯ to prepare a fresh compilation of everything.

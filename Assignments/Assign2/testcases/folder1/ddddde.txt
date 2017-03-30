@@ -1,0 +1,5 @@
+ Correctness (how well your code is working)
+ Quality of your design (did you use reasonable algorithms)
+ Quality of your code (how well written your code is, including modularity and comments)
+ Efficiency (of your implementation)
+ Testing thoroughness (quality of your test cases).

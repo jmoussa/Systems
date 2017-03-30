@@ -11,14 +11,15 @@
 #include <fcntl.h>
 
 typedef struct lnode{
-	char filename[100];
+	char* filename;
 	int count;
 	struct lnode* link;
 } linkNode;
 
 
 typedef struct hnode{
-	char word[100];
+	struct hnode* front;
+	char* word;
 	struct hnode* next;
 	linkNode* link;
 } hashNode;
@@ -26,8 +27,53 @@ typedef struct hnode{
 
 hashNode *hashTable = NULL;
 
+hashNode* newHashNode(hashNode*, char*, hashNode*, linkNode*);
+linkNode* newLinkNode(hashNode*, char*, int, linkNode*);
+hashNode* searchHash(hashNode*, char*);
 char * getnewpath(char *, char *);
 static void recursiveSearch(char*);
+
+
+hashNode* searchHash(hashNode* front, char* keyword){
+	hashNode* tmp = front;
+	while(tmp->next!=NULL){
+		if(tmp->word == keyword){
+			return tmp;
+		}else{
+			tmp=tmp->next;
+		}
+	}
+	return NULL;
+}
+
+linkNode* newLinkNode(char* filename, int count, linkNode* link){
+	linkNode* newnode;
+	newnode = (linkNode*)malloc(sizeof(linkNode));
+	newnode->filename = filename;
+	newnode->count = count;
+	newnode->link = link;
+	return newnode;
+}
+
+
+hashNode* newHashNode(hashNode* front, char* word, hashNode* next, linkNode* link){
+	hashNode *newnode;
+	newnode = (hashNode*) malloc(sizeof(hashNode));
+	newnode->word = word;
+	newnode->next = next;
+	newnode->link = link;
+	if(front==NULL){
+		front = newnode;
+		return newnode;
+	}else{
+		while(front->next!=NULL){
+			front=front->next;
+		}
+		front->next=newnode;
+	}	
+	return newnode;
+}
+
 
 void recursiveSearch(char* dirname){
 	DIR * dir;
@@ -51,10 +97,10 @@ void recursiveSearch(char* dirname){
 			head = countFromSingleFile(d_name);
 			Node* tmp=head;
 			while (tmp!=NULL) {
-				if(searchHash(hashTable,tmp->token)==-1){//couldnt find word
-					hashNode* top = newHashNode(hashTable,tmp->token, hashTable->next, NULL);
-					linkNode* first = newLinkNode(top,d_name, 1, NULL);
-					top->link=first;
+				if(searchHash(hashTable,tmp->token)==NULL){//couldnt find word
+					hashNode* newHash = newHashNode(hashTable,tmp->token, NULL, NULL); 
+					linkNode* first = newLinkNode(d_name, 1, NULL);
+					newHash->link=first;
 				}else{
 					hashNode* word = searchHash(hashTable,tmp->token); 
 					linkNode* temp = word->link;
@@ -68,7 +114,7 @@ void recursiveSearch(char* dirname){
 						}
 					}
 					if(temp->link==NULL){
-						linkNode* newFile = newLinkNode(hashTable,d_name,1, NULL); //inserts a newLink if the file is new (or not found in the linkNode list)
+						linkNode* newFile = newLinkNode(word,d_name,1, NULL); //inserts a newLink if the file is new (or not found in the linkNode list)
 						temp->link = newFile;
 					}
 				}

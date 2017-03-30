@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 
 	}
 	char buffer[1000000000];
-	int fd1=open(argv[1],O_CREAT | O_WRONLY);
+	int fd1=open(argv[1],O_CREAT | O_RDWR);
 	ssize_t n = 1000000000;
 	write(fd1,buffer,n);
 	printAsXml(hashTable);

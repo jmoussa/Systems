@@ -8,11 +8,28 @@
 #include <string.h>
 #include <limits.h>
 #include <errno.h>
+#include <fcntl.h>
+
+typedef struct lnode{
+	char filename[100];
+	int count;
+	struct lnode* link;
+} linkNode;
+
+
+typedef struct hnode{
+	char word[100];
+	struct hnode* next;
+	linkNode* link;
+} hashNode;
+
+
+hashNode *hashTable = NULL;
 
 char * getnewpath(char *, char *);
 static void recursiveSearch(char*);
 
-static void recursiveSearch(char* dirname){
+void recursiveSearch(char* dirname){
 	DIR * dir;
 	dir = opendir(dirname);
 	Node * head;
@@ -22,7 +39,7 @@ static void recursiveSearch(char* dirname){
 		exit(EXIT_FAILURE);
 	}
 	struct dirent* entry;
-	const char * d_name; //name of the file
+	char * d_name; //name of the file
 
 	entry = readdir(dir);
 
@@ -34,8 +51,16 @@ static void recursiveSearch(char* dirname){
 			head = countFromSingleFile(d_name);
 			Node* tmp=head;
 			while (tmp!=NULL) {
-				printf("%s\t\t%d\n", tmp->token,tmp->count);
-				tmp=tmp->next;
+				if(searchHash(hashTable,tmp->token)==-1){//couldnt find word
+					hashNode* top = newHashNode(hashTable,tmp->token, NULL, NULL);
+					linkNode* first = newLinkNode(top,d_name, 1, NULL);
+					top->link=first;
+				}else{
+					hashNode* word = searchHash(hashTable,tmp->token);
+						
+				}
+
+			tmp=tmp->next;
 			}
 		}
 		
@@ -67,24 +92,34 @@ int main(int argc, char const *argv[])
 	// All tokens in the file and their counts will be
 	// stored in the LinkedList 'head'
 	// ****************************************************************
-	//Node* head = countFromSingleFile("./testcases/1.txt");
+	Node* head = countFromSingleFile("./testcases/1.txt");
 	
 
 	// ****************************************************************
 	// Print TOKENs and COUNTs
 	// ****************************************************************
-	/*
 	Node* tmp=head;
 	while (tmp!=NULL) {
-		printf("%s\t\t%d\n", tmp->token,tmp->count);
+		printf("<Word Text= %s > \n\t <file name = %s > %d\n", tmp->token,argv[2],tmp->count);
 		tmp=tmp->next;
 	}
-   	*/
 
 
 	//BUILD INDEX
-	
+	/*
+	if(open(argv[2],O_RDONLY)==-1){
+		//directory found
+		recursiveSearch(argv[2]);
+	}else{
+		Node* head = countFromSingleFile(argv[2]);
+		Node* tmp=head;
+		while (tmp!=NULL) {
+			printf("%s\t\t%d\n", tmp->token,tmp->count);
+			tmp=tmp->next;
+		}
 
+	}
+	*/
 
 
 	//TODO Save index to a file (write and save to a file)

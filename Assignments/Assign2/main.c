@@ -80,23 +80,23 @@ void recursiveSearch(char* dirname){
 	dir = opendir(dirname);
 	Node * head;
 	char* newpath;
+	
 	if(!dir){
 		printf("Error Cannot Open Directory");
 		exit(EXIT_FAILURE);
 	}
+	
 	struct dirent* entry;
 	char * d_name; //name of the file
-
 	entry = readdir(dir);
 
 	while(entry!=NULL){
-
 		d_name = entry->d_name; //file or directory name
 		
 		if((entry->d_type & DT_REG)){ //if it's a file
 			head = countFromSingleFile(d_name);
 			Node* tmp=head;
-			while (tmp!=NULL) {
+			while (tmp->next!=NULL) {
 				if(searchHash(hashTable,tmp->token)==NULL){//couldnt find word
 					hashNode* newHash = newHashNode(hashTable,tmp->token, NULL, NULL); 
 					linkNode* first = newLinkNode(d_name, 1, NULL);
@@ -118,17 +118,17 @@ void recursiveSearch(char* dirname){
 						temp->link = newFile;
 					}
 				}
-
 			tmp=tmp->next;
 			}
 		}
 		
-		if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")){
+		if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")){//if it's a directory, delve deeper and run the search through the newpath
 			newpath = getnewpath(dirname, entry->d_name);
 			recursiveSearch(newpath);
 			free(newpath);
 			newpath = NULL;	
 		}
+		break;
 	}
 	if(closedir(dir)){
 		fprintf(stderr, "Couldn't close '%s': %s\n", dirname, strerror(errno));
@@ -203,11 +203,11 @@ int main(int argc, char *argv[])
 
 	}
 	char buffer[1000000000];
-	int fd1=open(argv[2],O_CREAT | O_WRONLY);
+	int fd1=open(argv[1],O_CREAT | O_WRONLY);
 	ssize_t n = 1000000000;
 	write(fd1,buffer,n);
 	printAsXml(hashTable);
-		
+	close(fd1);	
 	printAsXml(hashTable);
 	return 0;
 }

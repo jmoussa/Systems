@@ -151,9 +151,9 @@ void printAsXml(hashNode* head) {
 	while (tmp_h!=NULL) {
 		printf("\t<Word Text=\"%s\">", tmp_h->word);
 
-		linkNode* tmp_l=tmp_h.link;
+		linkNode* tmp_l=tmp_h->link;
 		while (tmp_l!=NULL) {
-			printf("\t\t<file name=\"%s\">\"%s\"</file>\n", tmp_l->filename, tmp_l->count);
+			printf("\t\t<file name=\"%s\">\"%d\"</file>\n", tmp_l->filename, tmp_l->count);
 			tmp_l=tmp_l->link;
 		}
 
@@ -166,41 +166,10 @@ void printAsXml(hashNode* head) {
 
 int main(int argc, char const *argv[])
 {
-	// ****************************************************************
-	// All tokens in the file and their counts will be
-	// stored in the LinkedList 'head'
-	// ****************************************************************
 	Node* head = countFromSingleFile("./testcases/1.txt");
 	
 
-	// ****************************************************************
-	// Print TOKENs and COUNTs
-	// ****************************************************************
-	Node* tmp=head;
-	while (tmp!=NULL) {
-		printf("<Word Text= %s > \n\t <file name = %s > %d\n", tmp->token,argv[2],tmp->count);
-		tmp=tmp->next;
-	}
-
-
-	//BUILD INDEX
-	/*
-	if(open(argv[2],O_RDONLY)==-1){
-		//directory found
-		recursiveSearch(argv[2]);
-	}else{
-		Node* head = countFromSingleFile(argv[2]);
-		Node* tmp=head;
-		while (tmp!=NULL) {
-			printf("%s\t\t%d\n", tmp->token,tmp->count);
-			tmp=tmp->next;
-		}
-
-	}
-	*/
-
-
-	//TODO Save index to a file (write and save to a file)
+	
 
 	return 0;
 }

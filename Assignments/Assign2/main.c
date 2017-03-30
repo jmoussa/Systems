@@ -145,6 +145,25 @@ char * getnewpath(char * dirname, char * newdir){
 	return newpath;
 }
 
+void printAsXml(hashNode* head) {
+	printf("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<fileIndex>\n");
+	hashNode* tmp_h=head;
+	while (tmp_h!=NULL) {
+		printf("\t<Word Text=\"%s\">", tmp_h->word);
+
+		linkNode* tmp_l=tmp_h.link;
+		while (tmp_l!=NULL) {
+			printf("\t\t<file name=\"%s\">\"%s\"</file>\n", tmp_l->filename, tmp_l->count);
+			tmp_l=tmp_l->link;
+		}
+
+		printf("\t</word>\n");
+
+		tmp_h=tmp_h->next;
+	}
+	printf("</fileIndex>\n");
+}
+
 int main(int argc, char const *argv[])
 {
 	// ****************************************************************

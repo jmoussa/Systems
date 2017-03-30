@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
 	}else{
 			head = countFromSingleFile(argv[2]);
 			Node* tmp=head;
-			while (tmp!=NULL) {
+			while (tmp->next!=NULL) {
 				if(searchHash(hashTable,tmp->token)==NULL){//couldnt find word
 					hashNode* newHash = newHashNode(hashTable,tmp->token, NULL, NULL); 
 					linkNode* first = newLinkNode(argv[2], 1, NULL);

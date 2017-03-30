@@ -167,7 +167,9 @@ void printAsXml(hashNode* head) {
 int main(int argc, char *argv[])
 {
 	Node* head;
-	
+	if(argc < 3){
+		printf("Error: invalid # of arguments");
+	}
 	if(open(argv[2],O_RDONLY)== -1){
 		recursiveSearch(argv[2]);
 	}else{
@@ -200,8 +202,12 @@ int main(int argc, char *argv[])
 			}
 
 	}
-
-	
+	char buffer[1000000000];
+	int fd1=open(argv[2],O_CREAT | O_WRONLY);
+	ssize_t n = 1000000000;
+	write(fd1,buffer,n);
+	printAsXml(hashTable);
+		
 	printAsXml(hashTable);
 	return 0;
 }

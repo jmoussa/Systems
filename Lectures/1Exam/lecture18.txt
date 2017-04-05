@@ -1,0 +1,63 @@
+Lecture 18 3/30/2017
+
+Review
+----------------------------------------------------------------------------------------
+MUTEX:
+    Guarantees data consistency when multiple execution contets can access the same data
+
+Consistency: the value you believe to be in memory is the value 
+Coherence: they type you believe a value to be is the type
+
+__sync_lock_test_and_set instruction
+----------------------------------------------
+    single instruction for mutex
+    can't stop and cant be divided
+
+
+DINING PHILOSOPHERS PROBLEM & Circular Wait
+-----------------------------------------------
+Pick Up chopsticks
+Eat
+Put Down 
+Think for a while
+
+Only 5 chopsticks, and 5 philosophers
+    -Each philosopher takes the right chopstick first (then left)
+    -Circular wait waiting for left chopstick (or the right of the other)
+
+===============================================
+SOLUTION STRUCTURES                           |
+===============================================
+
+MONITOR:
+-----------------------
+    -owns all mutexes
+    -understands how they interrelate
+    -will not allocate / pass them in a bad manner
+
+    Monitor <name>{
+        shared var declarations
+
+        functions(){
+
+        }
+    }
+NEEDED IF TOTAL ORDERING ISN'T POSSIBLE
+
+
+    
+CONDITIONAL VARIABLES:
+-----------------------
+    -reshapes a mutex
+    -allows you to use it to wait until some condistion occurs
+        
+pthread_cond_wait()
+        -Condition
+        -Lock
+        public class CondVar{
+            public Wait(Lock lock); //release the lock : put thread object on the wait queue of this CondVar object
+            public Signal();        //if at least 1 thread is sleeping on cond_var, wake 1 up. Otherwise no effect
+            public Broadcast();     //if 1 or more threds are sleeping on cond_var, wake everyone up. Otherwise no effect
+        }
+       
+

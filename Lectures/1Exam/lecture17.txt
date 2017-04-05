@@ -1,0 +1,65 @@
+Lecture 17 3/28/17
+
+Review
+--------------------------------------------
+Thread ~ Execution context
+    Registers
+    CPU Flags
+    Stack ptrs
+    PC - Program Counter - address of instruction executing
+
+Threads are "soft wall"
+    -Multiple stacks in the same process
+        -All stacks can access the same heap
+        -Can pass data b/n threads THROUGH HEAP
+
+----------------------------------------------------------------------------------------------------------------------------
+Potential PROBLEMS communicating b/n threads                                                                               |
+----------------------------------------------------------------------------------------------------------------------------
+        Thread1
+            ld      (%eax),%ebx
+            addl    %ebx, $100, %ecx
+            st      (%eax),%ecx
+        Thread2
+            ld      (%eax),%ebx
+            subl    %ebx, $50, %ecx
+            st      (%eax),%ecx
+        
+        -the thread instructions can be run out of order and across threads altering the point in memory inconsistently
+        -RACE CONDITION: last thread to write to memory wins
+
+Solution
+-------------------------------
+pthread_mutex_t lock;
+pthread_mutex_lock(&lock);
+pthread_mutex_unlock(&lock);
+
+pthread_mutex_init();
+    -lock a (region of a) thread at the beginning to prevent other threads from interrupting
+    -unlock when you're done with the thread and allowing other threads to begin/continue
+
+Thread1                 Thread2
+lock(mutex_balance);    lock(mutex_balance);
+balance+=100            balance+= -50;
+                        ror = ...
+                        interest = ...
+unlock(mutex_balance);  unlock(mutex_balance);
+---------------------------------
+
+mutex: MUTual EXclusion device
+    -best to have 1 MUTEX PER SHARED VARIABLE
+    -total ordering when locking mutexes (same lock order across threads)
+
+Critical Sections: areas of code where you access/modify shared data
+    TIP: Keep critical sections as small as possible (otherwise it's pointless to imlement threads)
+        unlock as soon as you're finished with shared memory/variables
+
+-----------------------------------------------------------------------------------------------------------------------------
+Side Note:
+Process has a hard wall
+    -can only communicate b/n processes with file system
+        -through files
+        -shared memory (make file look like memory)
+        -network socket
+    -all involve file descriptors
+

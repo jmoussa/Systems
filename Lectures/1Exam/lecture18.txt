@@ -61,3 +61,16 @@ pthread_cond_wait()
         }
        
 
+SEMAPHORES:
+----------------------
+Synced counting variables
+    -int value;
+    -2 operations: P() and V()
+        
+        P()- while value == 0, sleep
+            -decrement value
+
+        V() -increment value
+            -if any threads sleeping waiting for value to become non-zero, wakeup at least 1 thread
+
+

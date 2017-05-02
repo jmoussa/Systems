@@ -284,8 +284,8 @@ void* service_single_client(void* args)
             }
         }
         if (fake_return_fd != -1) {
-            bzero(buffer, sizeof buffer);
-            snprintf(buffer, sizeof buffer, "%d|SUCC", fake_return_fd);
+            bzero(buffer, sizeof(buffer);
+            snprintf(buffer, sizeof(buffer), "%d|SUCC", fake_return_fd);
             n = write(socket, buffer, strlen(buffer));
             if (n < 0) {
                 perror("ERROR writing to socket");
@@ -316,5 +316,4 @@ void* service_single_client(void* args)
     close(socket);
     free(wa);
     pthread_exit(NULL);
-
 }

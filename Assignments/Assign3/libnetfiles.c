@@ -168,14 +168,14 @@ int netclose(int fd){
     }
     //send string
     bzero(buffer,sizeof(buffer));
-    snprintf(buffer, sizeof(buffer),"%d|0|0|0","close",fd);
+    snprintf(buffer, sizeof(buffer),"%s|%d|0|0","close",fd);
     // printf("ddd%d\n",nbyte);
     n = write(sockfd,buffer,strlen(buffer));
     //read result
     bzero(buffer,8192);
     n = read(sockfd,buffer,2);
     // result = atoi(buffer);
-    printf("%s\n",buffer);
+    // printf("%s\n",buffer);
     close(sockfd);
     return atoi(buffer);
 

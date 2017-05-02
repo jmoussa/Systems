@@ -10,12 +10,15 @@ int main(int argc, char const* argv[])
     }
     char *test="Traverse the linked list2";
 
-    int fd=netopen("./test.txt", O_WRONLY);
-
+    int fd=netopen("./test.txt", O_RDWR);
+    if (fd==-1) {
+    	printf("Cannot open!\n");
+    	return 0;
+    }
     char buffer[512];
     netread(fd, buffer, 10);
     printf("%s\n",buffer );
     netwrite(fd, test, strlen(test));
-    
+    netclose(fd);
     return 0;
 }

@@ -365,7 +365,7 @@ void* service_single_client(void* args)
         if (fd == -1) {
             n = write(socket, "**fderr", strlen("**fderr"));
             if (n < 0) {
-                perror("ERROR writing to socket");
+                perror("ERROR writing to socket0");
                 close(socket);
                 free(wa);
                 pthread_exit(NULL);
@@ -377,9 +377,9 @@ void* service_single_client(void* args)
             if (input_length > 8192)
                 input_length = 8192;
             n = write(fd, tokens[2], input_length);
-            n = write(socket, '0', 1);
+            n = write(socket, "0", 1);
             if (n < 0) {
-                perror("ERROR writing to socket");
+                perror("ERROR writing to socket1");
                 close(socket);
                 free(wa);
                 pthread_exit(NULL);
@@ -429,9 +429,9 @@ void* service_single_client(void* args)
             cursor = cursor->next;
         }
         if (succ) {
-        	n = write(socket, '1', 1);
+        	n = write(socket, "1", 1);
         } else {
-        	n = write(socket, '0', 1);
+        	n = write(socket, "0", 1);
         }
         if (n < 0) {
             perror("ERROR writing to socket");

@@ -127,8 +127,8 @@ void* service_single_client(void* args)
     pthread_detach(pthread_self());
     fprintf(stderr, "Socket %d connected\n", socket);
     //Read string
-    bzero(buffer, sizeof buffer);
-    n = read(socket, buffer, sizeof buffer);
+    bzero(buffer, sizeof(buffer));
+    n = read(socket, buffer, sizeof(buffer));
     if (n < 0) {
         perror("ERROR reading from socket");
         close(socket);

@@ -3,10 +3,12 @@
 
 int main(int argc, char const *argv[])
 {
-    if (netserverinit("localhost",0)<0) {
+    if (netserverinit("localhost",EXCLUSIVE_MODE)<0) {
         printf("%d\n", errno);
         return 0;
     }
-    netopen("dddd\0",2);
+    netopen("./serverd.exe", O_RDONLY);
+        netopen("./server.exe", O_RDONLY);
+
     return 0;
 }

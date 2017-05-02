@@ -1,0 +1,8 @@
+Exception: STATUS_ACCESS_VIOLATION at eip=61138EE1
+eax=FFFFFFFE ebx=FFFFFFFE ecx=00000000 edx=FFFFFFFE esi=00000000 edi=FFFFFFFE
+ebp=0061C778 esp=0061C774 program=C:\Users\NK\Desktop\214hw\Systems\Assignments\Assign3\client.exe, pid 4984, thread main
+cs=0023 ds=002B es=002B fs=0053 gs=002B ss=002B
+Stack trace:
+Frame     Function  Args
+0061C778  61138EE1 (FFFFFFFE, 0061C824, 004030B7, 00000001)
+0061C89C  61145416 (00000008, 00000007, 000000FF, 0061CA34)

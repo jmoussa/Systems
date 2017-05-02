@@ -7,15 +7,38 @@
 #include <netinet/in.h>
 #include <pthread.h>
 #include <assert.h>
+#include <fcntl.h>
 
 #ifdef MUTEX
 pthread_mutex_t lock;
 #endif
 
+#define UNRESTRICTED_MODE 0
+#define EXCLUSIVE_MODE 1
+#define TRANSACTION_MODE 2
+
 const int portno = 8999;
 struct workerArgs {
     int socket;
 };
+
+int fd_count = -2;
+
+typedef struct opener {
+    int fd;
+    int real_fd;
+    int fmode;
+    int flag;
+    struct opener* next;
+} opener;
+
+typedef struct node {
+    char path[512];
+    struct opener* openers;
+    struct node* next;
+} node;
+
+node* fileListHead = NULL;
 
 void* service_single_client(void* args);
 
@@ -33,7 +56,6 @@ int main(int argc, char* argv[])
     int n;
     struct workerArgs* wa;
     pthread_t worker_thread;
-
     //Open new socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0)
@@ -82,8 +104,6 @@ char** str_split(char* a_str, const char a_delim)
     char delim[2];
     delim[0] = a_delim;
     delim[1] = 0;
-
-    /* Count how many elements will be extracted. */
     while (*tmp) {
         if (a_delim == *tmp) {
             count++;
@@ -91,20 +111,12 @@ char** str_split(char* a_str, const char a_delim)
         }
         tmp++;
     }
-
-    /* Add space for trailing token. */
     count += last_comma < (a_str + strlen(a_str) - 1);
-
-    /* Add space for terminating null string so caller
-       knows where the list of returned strings ends. */
     count++;
-
     result = malloc(sizeof(char*) * count);
-
     if (result) {
         size_t idx = 0;
         char* token = strtok(a_str, delim);
-
         while (token) {
             assert(idx < count);
             *(result + idx++) = strdup(token);
@@ -113,7 +125,6 @@ char** str_split(char* a_str, const char a_delim)
         assert(idx == count - 1);
         *(result + idx) = 0;
     }
-
     return result;
 }
 
@@ -134,18 +145,165 @@ void* service_single_client(void* args)
         close(socket);
         free(wa);
         pthread_exit(NULL);
+        return NULL;
     }
-    printf("Here is the message: %s\n", buffer);
+    // printf("Here is the message: %s\n", buffer);
     //Derive operation
+    //method	:	tokens[0]
+    //path 		:	actualpath_string
+    //fmode 	:	tokens[2]_string fmode_int
+    //flags 	:	tokens[3]_string flag_int
     char** tokens;
     tokens = str_split(buffer, '|');
     printf("Operation: %s\n", tokens[0]);
     char actualpath[512];
     char* ptr;
     ptr = realpath(tokens[1], actualpath);
-    printf("Path: %s\n", tokens[1]);
+    printf("Path: %s\n", actualpath);
     printf("fmode: %s\n", tokens[2]);
     printf("flags: %s\n", tokens[3]);
+    int flag = atoi(tokens[3]);
+    int fmode = atoi(tokens[2]);
+    int fake_return_fd = -1;
+    //netopen
+    if (strcmp(tokens[0], "open") == 0) {
+#ifdef MUTEX
+        pthread_mutex_lock(&lock);
+#endif
+        //Check if file exists
+        if (access(actualpath, F_OK) == -1) {
+            n = write(socket, "-1|NF", 16);
+            if (n < 0) {
+                perror("ERROR writing to socket");
+                close(socket);
+                free(wa);
+                pthread_exit(NULL);
+                return NULL;
+            }
+        }
+        else {
+            //find file in opened file list
+            if (fileListHead == NULL) {
+                //if not found in in the list
+                //create
+                fileListHead = (node*)malloc(sizeof(node));
+                strcpy(fileListHead->path, actualpath);
+                fileListHead->next = NULL;
+                fileListHead->openers = (opener*)malloc(sizeof(opener));
+                fileListHead->openers->real_fd = open(actualpath, flag);
+                fileListHead->openers->fd = fd_count;
+                fd_count--;
+                fileListHead->openers->fmode = fmode;
+                fileListHead->openers->flag = flag;
+                fileListHead->openers->next = NULL;
+                fake_return_fd = fileListHead->openers->fd;
+                // printf("new open file real_fd:%d\n",fileListHead->openers->real_fd);
+            }
+            else {
+                //if found in the list
+                //check permission
+                node* cursor = fileListHead;
+                while (cursor != NULL) {
+                    if (strcmp(cursor->path, actualpath) == 0) {
+                        // printf("find! %s\n", cursor->path);
+                        int allow = 1;
+                        opener* o_cursor = cursor->openers;
+                        while (o_cursor != NULL) {
+                            if (o_cursor->fmode == TRANSACTION_MODE) {
+                                n = write(socket, "-1|PER", 16);
+                                if (n < 0) {
+                                    perror("ERROR writing to socket");
+                                    close(socket);
+                                    free(wa);
+                                    pthread_exit(NULL);
+                                    return NULL;
+                                }
+                                allow = 0;
+                                break;
+                            }
+                            if (fmode == UNRESTRICTED_MODE) {
+                                if (flag == O_WRONLY) {
+                                    if ((o_cursor->fmode == EXCLUSIVE_MODE) && ((o_cursor->flag == O_WRONLY) || (o_cursor->flag == O_RDWR))) {
+                                        n = write(socket, "-1|PER", 16);
+                                        if (n < 0) {
+                                            perror("ERROR writing to socket");
+                                            close(socket);
+                                            free(wa);
+                                            pthread_exit(NULL);
+                                            return NULL;
+                                        }
+                                        allow = 0;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (fmode == EXCLUSIVE_MODE) {
+                                if ((o_cursor->flag == O_WRONLY) || (o_cursor->flag == O_RDWR)) {
+                                    n = write(socket, "-1|PER", 16);
+                                    if (n < 0) {
+                                        perror("ERROR writing to socket");
+                                        close(socket);
+                                        free(wa);
+                                        pthread_exit(NULL);
+                                        return NULL;
+                                    }
+                                    allow = 0;
+                                    break;
+                                }
+                            }
+                            if (fmode == TRANSACTION_MODE) {
+                                n = write(socket, "-1|PER", 16);
+                                if (n < 0) {
+                                    perror("ERROR writing to socket");
+                                    close(socket);
+                                    free(wa);
+                                    pthread_exit(NULL);
+                                    return NULL;
+                                }
+                                allow = 0;
+                                break;
+                            }
+                            o_cursor = o_cursor->next;
+                        }
+                        o_cursor = cursor->openers;
+                        while (o_cursor->next != NULL)
+                            o_cursor = o_cursor->next;
+                        o_cursor->next = (opener*)malloc(sizeof(opener));
+                        o_cursor->next->real_fd = open(actualpath, flag);
+                        o_cursor->next->fd = fd_count;
+                        fd_count--;
+                        o_cursor->next->fmode = fmode;
+                        o_cursor->next->flag = flag;
+                        o_cursor->next->next = NULL;
+                        fake_return_fd = o_cursor->next->fd;
+                        break;
+                    }
+
+                    cursor = cursor->next;
+                }
+            }
+        }
+        if (fake_return_fd != -1) {
+            bzero(buffer, sizeof buffer);
+            snprintf(buffer, sizeof buffer, "%d|SUCC", fake_return_fd);
+            n = write(socket, buffer, strlen(buffer));
+            if (n < 0) {
+                perror("ERROR writing to socket");
+                close(socket);
+                free(wa);
+                pthread_exit(NULL);
+            }
+        }
+#ifdef MUTEX
+        pthread_mutex_unlock(&lock);
+#endif
+    }
+    if (strcmp(tokens[0], "read") == 0) {
+    }
+    if (strcmp(tokens[0], "write") == 0) {
+    }
+    if (strcmp(tokens[0], "close") == 0) {
+    }
     free(tokens);
     n = write(socket, "123", 18);
     if (n < 0) {
@@ -158,10 +316,4 @@ void* service_single_client(void* args)
     close(socket);
     free(wa);
     pthread_exit(NULL);
-#ifdef MUTEX
-    pthread_mutex_lock(&lock);
-#endif
-#ifdef MUTEX
-    pthread_mutex_unlock(&lock);
-#endif
 }

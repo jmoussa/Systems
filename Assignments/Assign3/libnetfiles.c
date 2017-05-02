@@ -8,6 +8,7 @@
 #include <netdb.h>
 #include "libnetfiles.h"
 
+
 const int portno=8999;
 int inited = 0;
 int fmode =0;
@@ -60,9 +61,21 @@ int netopen(const char *pathname, int flags) {
     //read result
     bzero(buffer,256);
     n = read(sockfd,buffer,255);
-    result = atoi(buffer);
-    printf("%d\n",result);
+    // result = atoi(buffer);
+    printf("%s\n",buffer);
     close(sockfd);
     return 0;
 }
+
+ssize_t netread(int fildes, void *buf, size_t nbyte){
+
+};
+ssize_t netwrite(int fildes, const void *buf, size_t nbyte) {
+
+
+};
+int netclose(int fd){
+
+
+};
 

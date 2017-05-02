@@ -4,7 +4,7 @@ client: client.c libnetfiles.o
 	gcc -g -Wall client.c libnetfiles.o -o client
 
 server: netfileserver.c
-	gcc -g -Wall netfileserver.c -o server
+	gcc -g -Wall netfileserver.c -o server -DMUTEX
 
 libnetfiles.o: libnetfiles.c libnetfiles.h
 	gcc -g -Wall -c libnetfiles.c

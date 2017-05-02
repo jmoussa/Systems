@@ -55,8 +55,8 @@ int netopen(const char *pathname, int flags) {
         return -1;
     }
     //send string
-    bzero(buffer,sizeof buffer);
-    snprintf(buffer, sizeof buffer,"%s|%s|%d|%d","open",pathname,fmode,flags);
+    bzero(buffer,sizeof(buffer));
+    snprintf(buffer, sizeof(buffer),"%s|%s|%d|%d","open",pathname,fmode,flags);
     n = write(sockfd,buffer,strlen(buffer));
     //read result
     bzero(buffer,256);
@@ -69,13 +69,13 @@ int netopen(const char *pathname, int flags) {
 
 ssize_t netread(int fildes, void *buf, size_t nbyte){
 
-};
+}
 ssize_t netwrite(int fildes, const void *buf, size_t nbyte) {
 
 
-};
+}
 int netclose(int fd){
 
 
-};
+}
 

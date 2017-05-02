@@ -1,0 +1,15 @@
+Lecture 19 4/11/17
+
+===========================
+Dealing with Sockets      |
+===========================
+>Use flat data types (no structs(access the elements within them))
+>Set expectations before you start - include message length as part of/before the messsage
+    -"12 12 hi stuff"
+    -first 12 is the length of the message (starting at the second 12)
+    -if things don't work out then read and keep count of the bytes in the file
+        while(1){
+            read...
+            printf("%d: %X\n", ocunt, buff);
+        }
+>Blocking read/write on network

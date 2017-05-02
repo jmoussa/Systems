@@ -1,0 +1,7 @@
+Exception: STATUS_ACCESS_VIOLATION at eip=61139B78
+eax=00000000 ebx=200102E0 ecx=00000001 edx=FFEA0000 esi=20010340 edi=6119BA1F
+ebp=FFE9CE08 esp=FFE9C958 program=C:\Users\NK\Desktop\214hw\Systems\Assignments\Assign3\server.exe, pid 5348, thread unknown (0x19BC)
+cs=0023 ds=002B es=002B fs=0053 gs=002B ss=002B
+Stack trace:
+Frame     Function  Args
+End of stack trace

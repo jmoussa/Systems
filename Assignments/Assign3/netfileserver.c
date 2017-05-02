@@ -132,7 +132,7 @@ void* service_single_client(void* args)
 {
     struct workerArgs* wa;
     int socket, n;
-    char buffer[512];
+    char buffer[8192];
     wa = (struct workerArgs*)args;
     socket = wa->socket;
     pthread_detach(pthread_self());
@@ -159,9 +159,9 @@ void* service_single_client(void* args)
     char actualpath[512];
     char* ptr;
     ptr = realpath(tokens[1], actualpath);
-    printf("Path: %s\n", actualpath);
-    printf("fmode: %s\n", tokens[2]);
-    printf("flags: %s\n", tokens[3]);
+    // printf("Path: %s\n", actualpath);
+    // printf("fmode: %s\n", tokens[2]);
+    // printf("flags: %s\n", tokens[3]);
     int flag = atoi(tokens[3]);
     int fmode = atoi(tokens[2]);
     int fake_return_fd = -1;
@@ -265,17 +265,19 @@ void* service_single_client(void* args)
                             }
                             o_cursor = o_cursor->next;
                         }
-                        o_cursor = cursor->openers;
-                        while (o_cursor->next != NULL)
-                            o_cursor = o_cursor->next;
-                        o_cursor->next = (opener*)malloc(sizeof(opener));
-                        o_cursor->next->real_fd = open(actualpath, flag);
-                        o_cursor->next->fd = fd_count;
-                        fd_count--;
-                        o_cursor->next->fmode = fmode;
-                        o_cursor->next->flag = flag;
-                        o_cursor->next->next = NULL;
-                        fake_return_fd = o_cursor->next->fd;
+                        if (allow) {
+                            o_cursor = cursor->openers;
+                            while (o_cursor->next != NULL)
+                                o_cursor = o_cursor->next;
+                            o_cursor->next = (opener*)malloc(sizeof(opener));
+                            o_cursor->next->real_fd = open(actualpath, flag);
+                            o_cursor->next->fd = fd_count;
+                            fd_count--;
+                            o_cursor->next->fmode = fmode;
+                            o_cursor->next->flag = flag;
+                            o_cursor->next->next = NULL;
+                            fake_return_fd = o_cursor->next->fd;
+                        }
                         break;
                     }
 
@@ -284,8 +286,8 @@ void* service_single_client(void* args)
             }
         }
         if (fake_return_fd != -1) {
-            bzero(buffer, sizeof(buffer);
-            snprintf(buffer, sizeof(buffer), "%d|SUCC", fake_return_fd);
+            bzero(buffer, sizeof buffer);
+            snprintf(buffer, sizeof buffer, "%d", fake_return_fd);
             n = write(socket, buffer, strlen(buffer));
             if (n < 0) {
                 perror("ERROR writing to socket");
@@ -299,19 +301,153 @@ void* service_single_client(void* args)
 #endif
     }
     if (strcmp(tokens[0], "read") == 0) {
+        int input_fake_fd = atoi(tokens[1]);
+        int input_length = atoi(tokens[2]);
+        int fd = -1;
+        node* cursor = fileListHead;
+        while (cursor != NULL) {
+            opener* o_cursor = cursor->openers;
+            while (o_cursor != NULL) {
+                if (o_cursor->fd == input_fake_fd) {
+                    fd = o_cursor->real_fd;
+                    break;
+                }
+                o_cursor = o_cursor->next;
+            }
+            if (fd != -1)
+                break;
+            cursor = cursor->next;
+        }
+        // printf("%d\n", fd);
+        if (fd == -1) {
+            n = write(socket, "**fderr", strlen("**fderr"));
+            if (n < 0) {
+                perror("ERROR writing to socket");
+                close(socket);
+                free(wa);
+                pthread_exit(NULL);
+            }
+        }
+        else {
+            char nbuffer[8192];
+            bzero(nbuffer, sizeof(nbuffer));
+            if (input_length > 8192)
+                input_length = 8192;
+            n = read(fd, nbuffer, input_length);
+            n = write(socket, nbuffer, strlen(nbuffer));
+            if (n < 0) {
+                perror("ERROR writing to socket");
+                close(socket);
+                free(wa);
+                pthread_exit(NULL);
+            }
+        }
     }
     if (strcmp(tokens[0], "write") == 0) {
+        int input_fake_fd = atoi(tokens[1]);
+        int input_length = atoi(tokens[3]);
+        int fd = -1;
+        node* cursor = fileListHead;
+        while (cursor != NULL) {
+            opener* o_cursor = cursor->openers;
+            while (o_cursor != NULL) {
+                if (o_cursor->fd == input_fake_fd) {
+                    fd = o_cursor->real_fd;
+                    break;
+                }
+                o_cursor = o_cursor->next;
+            }
+            if (fd != -1)
+                break;
+            cursor = cursor->next;
+        }
+        // printf("%d\n", fd);
+        if (fd == -1) {
+            n = write(socket, "**fderr", strlen("**fderr"));
+            if (n < 0) {
+                perror("ERROR writing to socket");
+                close(socket);
+                free(wa);
+                pthread_exit(NULL);
+            }
+        }
+        else {
+            char nbuffer[8192];
+            bzero(nbuffer, sizeof(nbuffer));
+            if (input_length > 8192)
+                input_length = 8192;
+            n = write(fd, tokens[2], input_length);
+            n = write(socket, '0', 1);
+            if (n < 0) {
+                perror("ERROR writing to socket");
+                close(socket);
+                free(wa);
+                pthread_exit(NULL);
+            }
+        }
     }
     if (strcmp(tokens[0], "close") == 0) {
+    	int succ=0;
+        int input_fake_fd = atoi(tokens[1]);
+        node* cursor = fileListHead;
+        while (cursor != NULL) {
+            if (cursor->openers->fd == input_fake_fd) {
+                close(cursor->openers->real_fd);
+                succ=1;
+                cursor->openers = cursor->openers->next;
+                break;
+            }
+            else {
+                opener* o_cursor = cursor->openers;
+                opener* tmp = o_cursor;
+                while (o_cursor != NULL) {
+                    if (o_cursor->fd == input_fake_fd) {
+                        close(o_cursor->real_fd);
+                        succ=1;
+                        tmp->next = o_cursor->next;
+                        break;
+                    }
+                    tmp = o_cursor;
+                    o_cursor = o_cursor->next;
+                }
+            }
+            cursor = cursor->next;
+        }
+        cursor = fileListHead;
+        node* ctmp = cursor;
+        while (cursor != NULL) {
+            if (cursor->openers == NULL) {
+                if (cursor == fileListHead) {
+                    fileListHead = cursor->next;
+                }
+                else {
+                    ctmp->next = cursor->next;
+                }
+                break;
+            }
+            ctmp = cursor;
+            cursor = cursor->next;
+        }
+        if (succ) {
+        	n = write(socket, '1', 1);
+        } else {
+        	n = write(socket, '0', 1);
+        }
+        if (n < 0) {
+            perror("ERROR writing to socket");
+            close(socket);
+            free(wa);
+            pthread_exit(NULL);
+        }
     }
     free(tokens);
-    n = write(socket, "123", 18);
-    if (n < 0) {
-        perror("ERROR writing to socket");
-        close(socket);
-        free(wa);
-        pthread_exit(NULL);
-    }
+    // n = write(socket, "123", 18);
+    // if (n < 0) {
+    //     perror("ERROR writing to socket");
+    //     close(socket);
+    //     free(wa);
+    //     pthread_exit(NULL);
+    // }
     fprintf(stderr, "Socket %d closed\n", socket);
     close(socket);
     free(wa);

@@ -7,5 +7,6 @@ int main(int argc, char const *argv[])
         printf("%d\n", errno);
         return 0;
     }
+    netopen("dddd\0",2);
     return 0;
 }

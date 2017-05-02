@@ -13,12 +13,6 @@ int inited = 0;
 int fmode =0;
 struct sockaddr_in serv_addr;
 
-void error(const char *msg)
-{
-    perror(msg);
-    exit(0);
-}
-
 int netserverinit(char * hostname, int filemode) {
 	if ((filemode<0)||(filemode>2)) {
 		errno=INVALID_FILE_MODE;
@@ -37,6 +31,7 @@ int netserverinit(char * hostname, int filemode) {
     bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
     serv_addr.sin_port = htons(portno);
     inited = 1;
+    return 0;
 }
 
 int netopen(const char *pathname, int flags) {
@@ -44,22 +39,30 @@ int netopen(const char *pathname, int flags) {
 		h_errno=HOST_NOT_FOUND;
         return -1;		
 	}
-	int sockfd, n;
+	int sockfd, n,result;
+	char buffer[512];
     //Open new socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) 
-        error("ERROR opening socket");
+    if (sockfd < 0) {
+        perror("ERROR opening socket");
+        return -1;
+    }
     //Connect
-    if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
-        error("ERROR connecting");
-    n = write(sockfd,pathname,strlen(pathname));
-    if (n < 0) 
-         error("ERROR writing to socket");
+    if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) {
+        perror("ERROR connecting");
+        close(sockfd);
+        return -1;
+    }
+    //send string
+    bzero(buffer,sizeof buffer);
+    snprintf(buffer, sizeof buffer,"%s|%s|%d|%d","open",pathname,fmode,flags);
+    n = write(sockfd,buffer,strlen(buffer));
+    //read result
     bzero(buffer,256);
     n = read(sockfd,buffer,255);
-    if (n < 0) 
-         error("ERROR reading from socket");
-    printf("%s\n",buffer);
+    result = atoi(buffer);
+    printf("%d\n",result);
     close(sockfd);
     return 0;
 }
+
